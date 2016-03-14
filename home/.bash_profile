@@ -21,17 +21,6 @@ ll() {
     fi
 }
 
-# l - echo the last file to be used (getlast will simply set the env variables)
-getlastfile() {
-    LAST=$(history | egrep -o "(\s|^)~?[a-zA-Z0-9_-]*[./][./a-zA-Z0-9_-]*[^.](\s|$)" | tr -d ' ' | tail -$1 | head -1)
-    export l=${LAST/#\~/$HOME}
-    export l$1=${LAST/#\~/$HOME}
-    export LAST=$l
-    export LAST$1=$l
-}
-alias getlast="getlastfile $1"
-alias l="getlast 1; echo $l"
-
 # source profile quickly
 alias profile="source ~/.bash_profile"
 
@@ -55,5 +44,4 @@ if [ ! -f $localbin/jsawk ]; then
     chmod u+x $localbin/jsawk
 fi
 
-export PROMPT_COMMAND="getlast 2; getlast 1"
 export PS1="\n\[$(tput bold)\]\u:\W\\$ \[$(tput sgr0)\]"
