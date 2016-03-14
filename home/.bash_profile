@@ -13,27 +13,32 @@ alias ewetest="ssh -i ~/.ssh/ewetest -l ec2-user"
 alias mvnq="mvn package -Pquick && ./start.sh"
 
 # list-long and list-long-alphabetic - Display only useful ls data, in a presentable format (human-readable sizing, correct width columns)
-listlong() {
+ll() {
     if [ $# == 1 ] && [ -f $1 ]; then
         less $1 
     else
 	    ls -lhPpA $@ | tr -s ' ' | cut -d' ' -f1,3,5,9 | column -t
     fi
 }
-alias ll=listlong $@
 
-# el n = echo as output the last nth file to be used (getlast will simply set the env variables)
+# l - echo the last file to be used (getlast will simply set the env variables)
 getlastfile() {
     LAST=$(history | egrep -o "(\s|^)~?[a-zA-Z0-9_-]*[./][./a-zA-Z0-9_-]*[^.](\s|$)" | tr -d ' ' | tail -$1 | head -1)
     export l=${LAST/#\~/$HOME}
+    export l$1=${LAST/#\~/$HOME}
     export LAST=$l
     export LAST$1=$l
 }
 alias getlast="getlastfile $1"
-alias el="getlast $1; echo $l"
+alias l="getlast 1; echo $l"
 
 # source profile quickly
 alias profile="source ~/.bash_profile"
+
+# run command in the background w/o output
+run() {
+    nohup $@ >/dev/null 2>&1 &
+}
 
 # use vim configuration if none provided 
 if [ ! -f ~/.vimrc ]; then 
