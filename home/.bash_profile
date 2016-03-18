@@ -24,6 +24,29 @@ ll() {
 # source profile quickly
 alias profile="source ~/.bash_profile"
 
+# git add, then commit changes, then push
+acp() {
+    git add -A
+    git status
+    git commit -m "$1"
+    read -p "Press Enter to push changes"
+    git push
+}
+
+# quickly switch between work/home projects
+alias home="cd ~/Projects"
+alias work="cd ~/Work"
+
+# alias for Notes app
+#alias note="java -jar ~/.bin/Note.jar $@"
+#echo "new notttteee " > ~/.vim_notes_template
+#export VIM_NOTES_TEMPLATE="~/.vim_notes_template"
+note() {
+    filename="note:$@"
+    vim "${filename}"
+}
+alias notes="ls ~/.vim/bundle/vim-notes/misc/notes/user/"
+
 # run command in the background w/o output
 run() {
     nohup $@ >/dev/null 2>&1 &
@@ -31,17 +54,30 @@ run() {
 
 # use vim configuration if none provided 
 if [ ! -f ~/.vimrc ]; then 
-	git clone git://github.com/amix/vimrc.git ~/.vim_runtime
-    echo "set number" > ~/.vim_runtime/my_configs.vim
-    echo "colorscheme solarized" > ~/.vim_runtime/my_configs.vim
-	sh ~/.vim_runtime/install_basic_vimrc.sh
-    cp ~/.vim_runtime/sources_non_forked/vim-colors-solarized/colors/solarized.vim ~/.vim/colors/ 
-fi
+    git clone git://github.com/amix/vimrc.git ~/.vim_runtime
+    sh ~/.vim_runtime/install_awesome_vimrc.sh
 
-# get jawks for json notes 
-if [ ! -f $localbin/jsawk ]; then
-    curl -L http://github.com/micha/jsawk/raw/master/jsawk > $localbin/jsawk
-    chmod u+x $localbin/jsawk
+    # Solarized Colorscheme
+    #mkdir -p ~/.vim/colors/
+    #cp ~/.vim_runtime/sources_non_forked/vim-colors-solarized/colors/solarized.vim ~/.vim/colors/ 
+    mkdir -p ~/.vim/ftplugin/
+    # Pathogen
+    mkdir -p ~/.vim/autoload ~/.vim/bundle
+    curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
+    # Vim Notes
+    git clone git@github.com:xolox/vim-notes.git ~/.vim/bundle/vim-notes
+    # Vim Misc
+    git clone git@github.com:xolox/vim-misc.git ~/.vim/bundle/vim-misc
+    # Vim Sensible
+    git clone git://github.com/tpope/vim-sensible.git ~/.vim/bundle/vim-sensible
+    # Custom vim file
+    cat > ~/.vim_runtime/my_configs.vim << EOL
+        execute pathogen#infect()
+        set number
+       	syntax on
+        indent on
+        filetype plugin indent on 
+EOL
 fi
 
 export PS1="\n\[$(tput bold)\]\u:\W\\$ \[$(tput sgr0)\]"
