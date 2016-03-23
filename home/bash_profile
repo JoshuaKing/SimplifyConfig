@@ -15,7 +15,7 @@ alias mvnq="mvn package -Pquick && ./start.sh"
 # list-long and list-long-alphabetic - Display only useful ls data, in a presentable format (human-readable sizing, correct width columns)
 ll() {
     if [ $# == 1 ] && [ -f $1 ]; then
-        less $1 
+        vim $1 
     else
 	    ls -lhPpA $@ | tr -s ' ' | cut -d' ' -f1,3,5,9 | column -t
     fi
@@ -49,7 +49,14 @@ alias notes="ls ~/.vim/bundle/vim-notes/misc/notes/user/"
 
 # run command in the background w/o output
 run() {
-    nohup $@ >/dev/null 2>&1 &
+    filename="$@"
+    filenamenospace="/tmp/${filename// /}.log"
+    nohup $@ >"$filenamenospace" 2>&1 &
+}
+
+# kill service on TCP port
+killport() {
+    kill -TERM `lsof -i "tcp:$1" | tail -1 | tr -s ' ' | cut -d ' ' -f 2)`
 }
 
 # use vim configuration if none provided 
@@ -57,10 +64,13 @@ if [ ! -f ~/.vimrc ]; then
     git clone git://github.com/amix/vimrc.git ~/.vim_runtime
     sh ~/.vim_runtime/install_awesome_vimrc.sh
 
-    # Solarized Colorscheme
-    #mkdir -p ~/.vim/colors/
-    #cp ~/.vim_runtime/sources_non_forked/vim-colors-solarized/colors/solarized.vim ~/.vim/colors/ 
+    # Filetype plugin
     mkdir -p ~/.vim/ftplugin/
+    # Solarized Colorscheme
+    mkdir -p ~/.vim/colors/
+    cp ~/.vim_runtime/sources_non_forked/vim-colors-solarized/colors/solarized.vim ~/.vim/colors/ 
+    # Ocean Deep Color Scheme
+    curl -LSso ~/.vim/colors/oceandeep.vim https://raw.githubusercontent.com/vim-scripts/oceandeep/master/colors/oceandeep.vim
     # Pathogen
     mkdir -p ~/.vim/autoload ~/.vim/bundle
     curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
@@ -75,8 +85,13 @@ if [ ! -f ~/.vimrc ]; then
         execute pathogen#infect()
         set number
        	syntax on
-        indent on
         filetype plugin indent on 
+        let g:notes_suffix='.note'
+	    "colorscheme oceandeep
+	    set background=dark
+	    colorscheme solarized
+        set cmdheight=1
+        set numberwidth=3
 EOL
 fi
 
