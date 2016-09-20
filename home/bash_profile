@@ -96,3 +96,5 @@ EOL
 fi
 
 export PS1="\n\[$(tput bold)\]\u:\W\\$ \[$(tput sgr0)\]"
+export HISTSIZE=1000
+export HISTFILESIZE=5000
