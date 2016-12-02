@@ -3,10 +3,11 @@ localbin=~/.bin
 mkdir -p $localbin
 
 # Stream Twitch to VLC
-alias stream="livestreamer $1 source --hls-segment-threads 5 --player-passthrough hls"
+alias stream="livestreamer --hls-segment-threads 5 --player-passthrough hls --default-stream high $1"
 
 # Aliases for certain SSH Keys
-alias sshwork="ssh -i ~/.ssh/work_from_home"
+alias sshwork="ssh -i ~/.ssh/work_from_home_rsa"
+alias awssh="ssh -l ec2-user"
 alias ewetest="ssh -i ~/.ssh/ewetest -l ec2-user"
 
 # With the .m2/settings.xml profile - disable many tests, checks, and only run the bare minimum to compile and then execute
@@ -25,13 +26,34 @@ ll() {
 alias profile="source ~/.bash_profile"
 
 # git add, then commit changes, then push
-acp() {
+publish() {
     git add -A
     git status
-    git commit -m "$1"
+    git commit -m "$@"
     read -p "Press Enter to push changes"
     git push
 }
+
+wgit() {
+    GIT_SSH_COMMAND="ssh -i ~/.ssh/work_from_home_rsa" git $@
+    unset GIT_SSH_COMMAND
+}
+
+function prewe {
+    remote="origin"
+    # url="$(git remote get-url ${remote})"
+    url="$(git remote -v | head -1 | cut -f2 -d\         | cut -f1 -d' ')"
+    domain=$(echo -n "${url}" | sed "s/git@\(.*\):.*/\1/")
+    repo=$(echo -n "${url}" | sed "s/.*:\(.*\).git/\1/")
+    branch="$(git rev-parse --abbrev-ref HEAD)"
+    curl -XPOST -u "$USER" -k "https://${domain}/api/v3/repos/${repo}/pulls" -d '{
+        "base": "master",
+        "head": "'"${branch}"'",
+        "title": "'"${1}"'"
+    }'
+}
+
+alias pr="prewe"
 
 # quickly switch between work/home projects
 alias home="cd ~/Projects"
@@ -56,8 +78,14 @@ run() {
 
 # kill service on TCP port
 killport() {
-    kill -TERM `lsof -i "tcp:$1" | tail -1 | tr -s ' ' | cut -d ' ' -f 2)`
+    kill -TERM `lsof -i "tcp:$1" | tail -1 | tr -s ' ' | cut -d ' ' -f 2`
 }
+
+# git aliases
+alias gs="git status"
+alias ga="git add -A"
+alias gc="git commit -m"
+alias master="git stash; git checkout master; git pull; git stash pop"
 
 # use vim configuration if none provided 
 if [ ! -f ~/.vimrc ]; then 
@@ -98,3 +126,8 @@ fi
 export PS1="\n\[$(tput bold)\]\u:\W\\$ \[$(tput sgr0)\]"
 export HISTSIZE=1000
 export HISTFILESIZE=5000
+
+# Setting PATH for Python 3.5
+# The original version is saved in .bash_profile.pysave
+PATH="/Library/Frameworks/Python.framework/Versions/3.5/bin:${PATH}"
+export PATH
