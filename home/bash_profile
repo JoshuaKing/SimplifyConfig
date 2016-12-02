@@ -43,7 +43,7 @@ function prewe {
     user="josking" # $USER
     remote="origin"
     # url="$(git remote get-url ${remote})"
-    url="$(git remote -v | head -1 | cut -f2 -d\         | cut -f1 -d' ')"
+    url="$(git remote -v | head -1 | cut -f2 | cut -f1 -d' ')"
     domain=$(echo -n "${url}" | sed "s/git@\(.*\):.*/\1/")
     repo=$(echo -n "${url}" | sed "s/.*:\(.*\).git/\1/")
     branch="$(git rev-parse --abbrev-ref HEAD)"
