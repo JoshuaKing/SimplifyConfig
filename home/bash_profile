@@ -65,10 +65,12 @@ alias work="cd ~/Work"
 #echo "new notttteee " > ~/.vim_notes_template
 #export VIM_NOTES_TEMPLATE="~/.vim_notes_template"
 note() {
-    filename="note:$@"
-    vim "${filename}"
+    mkdir -p ~/Notes
+    filename="$@.note"
+    vim ~/Notes/${filename}
 }
-alias notes="ls ~/.vim/bundle/vim-notes/misc/notes/user/"
+#alias notes="ls ~/.vim/bundle/vim-notes/misc/notes/user/"
+alias notes="ls ~/Notes/"
 
 # run command in the background w/o output
 run() {
