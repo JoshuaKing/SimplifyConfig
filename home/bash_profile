@@ -127,8 +127,13 @@ EOL
 fi
 
 export PS1="\n\[$(tput bold)\]\u:\W\\$ \[$(tput sgr0)\]"
-export HISTSIZE=1000
-export HISTFILESIZE=5000
+
+# History across tabs/windows
+export HISTCONTROL=ignoredups:erasedups  # no duplicate entries
+export HISTSIZE=100000                   # big big history
+export HISTFILESIZE=100000               # big big history
+shopt -s histappend                      # append to history, don't overwrite it
+export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"  # Save and reload the history after each command finishes
 
 # Setting PATH for Python 3.5
 # The original version is saved in .bash_profile.pysave
