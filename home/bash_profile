@@ -40,14 +40,15 @@ wgit() {
 }
 
 function prewe {
-    user="josking" # $USER
+    user="JoshuaKing" # $USER
     remote="origin"
     # url="$(git remote get-url ${remote})"
     url="$(git remote -v | head -1 | cut -f2 | cut -f1 -d' ')"
     domain=$(echo -n "${url}" | sed "s/git@\(.*\):.*/\1/")
-    repo=$(echo -n "${url}" | sed "s/.*:\(.*\).git/\1/")
+    repo=$(echo -n "${url}" | sed "s/.*:.*\/\(.*\).git/\1/")
+    org=$(echo -n "${url}" | sed "s/.*:\([^/]*\).*/\1/")
     branch="$(git rev-parse --abbrev-ref HEAD)"
-    curl -XPOST -u "$user" -k "https://${domain}/api/v3/repos/${repo}/pulls" -d '{
+    curl -XPOST -u "$user" -k "https://api.${domain}/repos/${org}/${repo}/pulls" -d '{
         "base": "master",
         "head": "'"${branch}"'",
         "title": "'"${1}"'"
